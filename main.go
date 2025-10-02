@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -99,6 +100,12 @@ func assignConfFields[T any](s *T, values map[string]string) error {
 		switch field.Type.Kind() {
 		case reflect.String:
 			fieldVal.SetString(fieldValueStr)
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			intVal, err := strconv.ParseInt(fieldValueStr, 10, 64)
+			if err != nil {
+				return fmt.Errorf("failed to parse int for field %s: %w", fieldName, err)
+			}
+			fieldVal.SetInt(intVal)
 		default:
 			return fmt.Errorf("unsupported field type for field %s", fieldName)
 		}
